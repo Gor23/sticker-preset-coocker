@@ -1,9 +1,11 @@
 package com.comtrans.service
 
+import com.comtrans.model.MCCMNCModel
 import com.comtrans.model.UIPresetsModel
 import groovy.util.logging.Slf4j
 import org.springframework.stereotype.Service
 
+import javax.annotation.PostConstruct
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
@@ -11,6 +13,14 @@ import java.nio.file.Path
 @Service
 @Slf4j
 class PresetParserService {
+
+    @PostConstruct
+    void test(){
+
+        readFile("F:\\preset.bin")
+        UIPresetsModel model = toUIPresetModel()
+        println("finish")
+    }
 
     final static Integer FILE_LENGTH = 441
     private Byte[] presetsBinary = new Byte[FILE_LENGTH]
@@ -35,19 +45,21 @@ class PresetParserService {
     Byte[] serverPort = new Byte[6]
 
     //uzor settings/////////
-    Byte sensorEnable0
-    Byte sensorEnable1
-    Short levelMax0
-    Short levelMax1
-    Byte dLevelMaxPrecent0
-    Byte dLevelMaxPrecent1
+    Short sensorEnable0
+    Short sensorEnable1
+    Integer levelMax0
+    Integer levelMax1
+    Short dLevelMaxPrecent0
+    Short dLevelMaxPrecent1
 
     //device settings
-    Integer deviceID
-    Integer sim0MCCMNC
-    Integer[] sim1MCCMNC = new Integer[70]
+    Long deviceID
+    Integer sim0MCC
+    Integer sim0MNC
+    Integer[] sim1MCC = new Integer[70]
+    Integer[] sim1MNC = new Integer[70]
 
-    Short crc16
+    Integer crc16
 
     /**
      * Load binary file
@@ -109,36 +121,36 @@ class PresetParserService {
         for(int i; i<serverPort.length; i++){
             serverPort[i] = presetsBinary[j++]
         }
-        sensorEnable0 = presetsBinary[j++]
-        sensorEnable1 = presetsBinary[j++]
+        sensorEnable0 = presetsBinary[j++]&0xFF
+        sensorEnable1 = presetsBinary[j++]&0xFF
 
-        levelMax0 = presetsBinary[j++]>>8
-        levelMax0 |= presetsBinary[j++]
-        levelMax1 = presetsBinary[j++]>>8
-        levelMax1 |= presetsBinary[j++]
+        levelMax0 = (presetsBinary[j++]&0xFF)<<8
+        levelMax0 |= presetsBinary[j++]&0xFF
+        levelMax1 = (presetsBinary[j++]&0xFF)<<8
+        levelMax1 |= presetsBinary[j++]&0xFF
 
-        dLevelMaxPrecent0 = presetsBinary[j++]
-        dLevelMaxPrecent1 = presetsBinary[j++]
+        dLevelMaxPrecent0 = presetsBinary[j++]&0xFF
+        dLevelMaxPrecent1 = presetsBinary[j++]&0xFF
 
-        deviceID = presetsBinary[j++]>>24
-        deviceID |= presetsBinary[j++]>>16
-        deviceID |= presetsBinary[j++]>>8
-        deviceID |= presetsBinary[j++]
+        deviceID = (presetsBinary[j++]&0xFF)<<24
+        deviceID |= (presetsBinary[j++]&0xFF)<<16
+        deviceID |= (presetsBinary[j++]&0xFF)<<8
+        deviceID |= presetsBinary[j++]&0xFF
 
-        sim0MCCMNC = presetsBinary[j++]>>24
-        sim0MCCMNC |= presetsBinary[j++]>>16
-        sim0MCCMNC |= presetsBinary[j++]>>8
-        sim0MCCMNC |= presetsBinary[j++]
+        sim0MCC = (presetsBinary[j++]&0xFF)<<8
+        sim0MCC |= presetsBinary[j++]&0xFF
+        sim0MNC = (presetsBinary[j++]&0xFF)<<8
+        sim0MNC |= presetsBinary[j++]&0xFF
 
-        for(int i; i<sim1MCCMNC.length; i++){
-            sim1MCCMNC[i] = presetsBinary[j++]>>24
-            sim1MCCMNC[i] |= presetsBinary[j++]>>16
-            sim1MCCMNC[i] |= presetsBinary[j++]>>8
-            sim1MCCMNC[i] |= presetsBinary[j++]
+        for(int i; i<sim1MCC.length; i++){
+            sim1MCC[i] = (presetsBinary[j++]&0xFF)<<8
+            sim1MCC[i] |= presetsBinary[j++]&0xFF
+            sim1MNC[i] = (presetsBinary[j++]&0xFF)<<8
+            sim1MNC[i] |= presetsBinary[j++]&0xFF
         }
 
-        crc16 = presetsBinary[j++]>>8
-        crc16 |= presetsBinary[j]
+        crc16 = (presetsBinary[j++]&0xFF)<<8
+        crc16 |= presetsBinary[j]&0xFF
     }
 
     /**
@@ -149,14 +161,14 @@ class PresetParserService {
 
         toPresetModel()
         UIPresetsModel uiPresetsModel = new UIPresetsModel(
-                sim0Apn: sim0Apn.toString(),
-                sim0ApnUser: sim0ApnUser.toString(),
-                sim0ApnPassword: sim0ApnPassword.toString(),
-                sim1Apn: sim0Apn.toString(),
-                sim1ApnUser: sim0ApnUser.toString(),
-                sim1ApnPassword: sim0ApnPassword.toString(),
-                serverURL: serverURL.toString(),
-                serverPort: serverPort.toString(),
+                sim0Apn: new String(sim0Apn).trim(),
+                sim0ApnUser: new String(sim0ApnUser).trim(),
+                sim0ApnPassword: new String(sim0ApnPassword).trim(),
+                sim1Apn: new String(sim1Apn).trim(),
+                sim1ApnUser: new String(sim1ApnUser).trim(),
+                sim1ApnPassword: new String(sim1ApnPassword).trim(),
+                serverURL: new String(serverURL).trim(),
+                serverPort: new String(serverPort).trim(),
                 sensorEnable0: sensorEnable0.toString(),
                 sensorEnable1: sensorEnable1.toString(),
                 levelMax0: levelMax0.toString(),
@@ -164,11 +176,12 @@ class PresetParserService {
                 dLevelMaxPrecent0: dLevelMaxPrecent0.toString(),
                 dLevelMaxPrecent1: dLevelMaxPrecent1.toString(),
                 deviceID: deviceID.toString(),
-                sim0MCCMNC: sim0MCCMNC.toString(),
+                sim0MCCMNC: new MCCMNCModel(MCC: sim0MCC.toString(), MNC: sim0MNC.toString()),
+                crc16: crc16.toString()
         )
 
         for(int i; i<70; i++){
-            uiPresetsModel.sim1MCCMNC.add(sim1MCCMNC[i].toString())
+            uiPresetsModel.sim1MCCMNC.add(new MCCMNCModel(MCC: sim1MCC[i].toString(), MNC: sim1MNC[i].toString()))
         }
 
         return uiPresetsModel

@@ -26,8 +26,8 @@ class UIPresetsModel {
 
     //device settings
     String deviceID
-    String sim0MCCMNC
-    List<String> sim1MCCMNC = []
+    MCCMNCModel sim0MCCMNC
+    List<MCCMNCModel> sim1MCCMNC = []
 
-    Short crc16
+    String crc16
 }
