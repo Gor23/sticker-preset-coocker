@@ -14,35 +14,44 @@ import java.nio.file.Path
 @Slf4j
 class PresetParserService {
 
-    @PostConstruct
-    void test(){
+//    @PostConstruct
+//    void test() {
+//
+//        readFile("/home/igor/Dropbox/preset.bin")
+//        UIPresetsModel model = toUIPresetModel()
+//        fromUiPresetModelToByteArray(model)
+//        writeFile("/home/igor/Dropbox/preset2.bin")
+//        println("finish")
+//    }
 
-        readFile("F:\\preset.bin")
-        UIPresetsModel model = toUIPresetModel()
-        println("finish")
+    UIPresetsModel readModelFromFile(){
+
+        readFile("/home/igor/Dropbox/preset.bin")
+        return toUIPresetModel()
     }
 
     final static Integer FILE_LENGTH = 441
-    private Byte[] presetsBinary = new Byte[FILE_LENGTH]
+    final static Integer APN_STRING_LENGTH = 31
+    final static Integer APN_USER_STRING_LENGTH = 11
+    final static Integer APN_PASSWORD_STRING_LENGTH = 11
+    final static Integer SERVER_URL_STRING_LENGTH = 31
+    final static Integer SERVER_PORT_STRING_LENGTH = 6
 
-    //String path = "C:\\Users\\IGOR\\git\\f103c\\tabloMaster\\Debug\\tabloMaster.bin"
-
-    short pageSize = 128
-    byte[] outArray = new byte[pageSize]
+    private byte[] presetsBinary = new byte[FILE_LENGTH]
 
     //sim 0 settings/////////
-    Byte[] sim0Apn = new Byte[31]
-    Byte[] sim0ApnUser = new Byte[11]
-    Byte[] sim0ApnPassword = new Byte[11]
+    byte[] sim0Apn = new byte[APN_STRING_LENGTH]
+    byte[] sim0ApnUser = new byte[APN_USER_STRING_LENGTH]
+    byte[] sim0ApnPassword = new byte[APN_PASSWORD_STRING_LENGTH]
 
     //sim 1 settings/////////
-    Byte[] sim1Apn = new Byte[31]
-    Byte[] sim1ApnUser = new Byte[11]
-    Byte[] sim1ApnPassword = new Byte[11]
+    byte[] sim1Apn = new byte[APN_STRING_LENGTH]
+    byte[] sim1ApnUser = new byte[APN_USER_STRING_LENGTH]
+    byte[] sim1ApnPassword = new byte[APN_PASSWORD_STRING_LENGTH]
 
     //server settings/////////
-    Byte[] serverURL = new Byte[31]
-    Byte[] serverPort = new Byte[6]
+    byte[] serverURL = new byte[SERVER_URL_STRING_LENGTH]
+    byte[] serverPort = new byte[SERVER_PORT_STRING_LENGTH]
 
     //uzor settings/////////
     Short sensorEnable0
@@ -86,7 +95,7 @@ class PresetParserService {
             fileData = new byte[FILE_LENGTH]
         }
 
-        Arrays.fill(presetsBinary, (byte) 0);
+        Arrays.fill(presetsBinary, (byte) 0)
         presetsBinary = fileData
     }
 
@@ -97,67 +106,67 @@ class PresetParserService {
 
         Integer j = 0
 
-        for(int i; i<sim0Apn.length; i++){
+        for (int i; i < sim0Apn.length; i++) {
             sim0Apn[i] = presetsBinary[j++]
         }
-        for(int i; i<sim0ApnUser.length; i++){
+        for (int i; i < sim0ApnUser.length; i++) {
             sim0ApnUser[i] = presetsBinary[j++]
         }
-        for(int i; i<sim0ApnPassword.length; i++){
+        for (int i; i < sim0ApnPassword.length; i++) {
             sim0ApnPassword[i] = presetsBinary[j++]
         }
-        for(int i; i<sim1Apn.length; i++){
+        for (int i; i < sim1Apn.length; i++) {
             sim1Apn[i] = presetsBinary[j++]
         }
-        for(int i; i<sim1ApnUser.length; i++){
+        for (int i; i < sim1ApnUser.length; i++) {
             sim1ApnUser[i] = presetsBinary[j++]
         }
-        for(int i; i<sim1ApnPassword.length; i++){
+        for (int i; i < sim1ApnPassword.length; i++) {
             sim1ApnPassword[i] = presetsBinary[j++]
         }
-        for(int i; i<serverURL.length; i++){
+        for (int i; i < serverURL.length; i++) {
             serverURL[i] = presetsBinary[j++]
         }
-        for(int i; i<serverPort.length; i++){
+        for (int i; i < serverPort.length; i++) {
             serverPort[i] = presetsBinary[j++]
         }
-        sensorEnable0 = presetsBinary[j++]&0xFF
-        sensorEnable1 = presetsBinary[j++]&0xFF
+        sensorEnable0 = presetsBinary[j++] & 0xFF
+        sensorEnable1 = presetsBinary[j++] & 0xFF
 
-        levelMax0 = (presetsBinary[j++]&0xFF)<<8
-        levelMax0 |= presetsBinary[j++]&0xFF
-        levelMax1 = (presetsBinary[j++]&0xFF)<<8
-        levelMax1 |= presetsBinary[j++]&0xFF
+        levelMax0 = (presetsBinary[j++] & 0xFF) << 8
+        levelMax0 |= presetsBinary[j++] & 0xFF
+        levelMax1 = (presetsBinary[j++] & 0xFF) << 8
+        levelMax1 |= presetsBinary[j++] & 0xFF
 
-        dLevelMaxPrecent0 = presetsBinary[j++]&0xFF
-        dLevelMaxPrecent1 = presetsBinary[j++]&0xFF
+        dLevelMaxPrecent0 = presetsBinary[j++] & 0xFF
+        dLevelMaxPrecent1 = presetsBinary[j++] & 0xFF
 
-        deviceID = (presetsBinary[j++]&0xFF)<<24
-        deviceID |= (presetsBinary[j++]&0xFF)<<16
-        deviceID |= (presetsBinary[j++]&0xFF)<<8
-        deviceID |= presetsBinary[j++]&0xFF
+        deviceID = (presetsBinary[j++] & 0xFF) << 24
+        deviceID |= (presetsBinary[j++] & 0xFF) << 16
+        deviceID |= (presetsBinary[j++] & 0xFF) << 8
+        deviceID |= presetsBinary[j++] & 0xFF
 
-        sim0MCC = (presetsBinary[j++]&0xFF)<<8
-        sim0MCC |= presetsBinary[j++]&0xFF
-        sim0MNC = (presetsBinary[j++]&0xFF)<<8
-        sim0MNC |= presetsBinary[j++]&0xFF
+        sim0MCC = (presetsBinary[j++] & 0xFF) << 8
+        sim0MCC |= presetsBinary[j++] & 0xFF
+        sim0MNC = (presetsBinary[j++] & 0xFF) << 8
+        sim0MNC |= presetsBinary[j++] & 0xFF
 
-        for(int i; i<sim1MCC.length; i++){
-            sim1MCC[i] = (presetsBinary[j++]&0xFF)<<8
-            sim1MCC[i] |= presetsBinary[j++]&0xFF
-            sim1MNC[i] = (presetsBinary[j++]&0xFF)<<8
-            sim1MNC[i] |= presetsBinary[j++]&0xFF
+        for (int i; i < sim1MCC.length; i++) {
+            sim1MCC[i] = (presetsBinary[j++] & 0xFF) << 8
+            sim1MCC[i] |= presetsBinary[j++] & 0xFF
+            sim1MNC[i] = (presetsBinary[j++] & 0xFF) << 8
+            sim1MNC[i] |= presetsBinary[j++] & 0xFF
         }
 
-        crc16 = (presetsBinary[j++]&0xFF)<<8
-        crc16 |= presetsBinary[j]&0xFF
+        crc16 = (presetsBinary[j++] & 0xFF) << 8
+        crc16 |= presetsBinary[j] & 0xFF
     }
 
     /**
      * deserialize file to ui preset model (strings)
      * @return
      */
-    UIPresetsModel toUIPresetModel(){
+    UIPresetsModel toUIPresetModel() {
 
         toPresetModel()
         UIPresetsModel uiPresetsModel = new UIPresetsModel(
@@ -180,11 +189,185 @@ class PresetParserService {
                 crc16: crc16.toString()
         )
 
-        for(int i; i<70; i++){
+        for (int i; i < 70; i++) {
             uiPresetsModel.sim1MCCMNC.add(new MCCMNCModel(MCC: sim1MCC[i].toString(), MNC: sim1MNC[i].toString()))
         }
 
         return uiPresetsModel
+    }
+
+    /**
+     * convert data arrays to common data array
+     */
+    void fromPresetByteModelToByteArray() {
+
+        Integer j = 0
+
+        Arrays.fill(presetsBinary, (byte) 0)
+
+        for (int i; i < sim0Apn.length; i++) {
+            presetsBinary[j++] = sim0Apn[i]
+        }
+        for (int i; i < sim0ApnUser.length; i++) {
+            presetsBinary[j++] = sim0ApnUser[i]
+        }
+        for (int i; i < sim0ApnPassword.length; i++) {
+            presetsBinary[j++] = sim0ApnPassword[i]
+        }
+        for (int i; i < sim1Apn.length; i++) {
+            presetsBinary[j++] = sim1Apn[i]
+        }
+        for (int i; i < sim1ApnUser.length; i++) {
+            presetsBinary[j++] = sim1ApnUser[i]
+        }
+        for (int i; i < sim1ApnPassword.length; i++) {
+            presetsBinary[j++] = sim1ApnPassword[i]
+        }
+        for (int i; i < serverURL.length; i++) {
+            presetsBinary[j++] = serverURL[i]
+        }
+        for (int i; i < serverPort.length; i++) {
+            presetsBinary[j++] = serverPort[i]
+        }
+        presetsBinary[j++] = (byte) sensorEnable0&0xFF
+        presetsBinary[j++] = (byte) sensorEnable0&0xFF
+
+        presetsBinary[j++] = (byte)(levelMax0>>8)&0xFF
+        presetsBinary[j++] |= (byte)levelMax0&0xFF
+        presetsBinary[j++] = (byte)(levelMax1>>8)&0xFF
+        presetsBinary[j++] |= (byte)levelMax1&0xFF
+
+        presetsBinary[j++] = (byte)dLevelMaxPrecent0&0xFF
+        presetsBinary[j++] = (byte)dLevelMaxPrecent1&0xFF
+
+        presetsBinary[j++] = (byte) (deviceID>>24)&0xFF
+        presetsBinary[j++] |= (byte) (deviceID>>16)&0xFF
+        presetsBinary[j++] |= (byte) (deviceID>>8)&0xFF
+        presetsBinary[j++] |= (byte) deviceID&0xFF
+
+
+        presetsBinary[j++] = (byte) (sim0MCC>>8)&0xFF
+        presetsBinary[j++] |= (byte) sim0MCC&0xFF
+        presetsBinary[j++] = (byte) (sim0MNC>>8)&0xFF
+        presetsBinary[j++] |= (byte) sim0MNC&0xFF
+
+
+        for (int i; i < sim1MCC.length; i++) {
+            presetsBinary[j++] = (byte) (sim1MCC[i]>>8)&0xFF
+            presetsBinary[j++] |= (byte) sim1MCC[i]&0xFF
+            presetsBinary[j++] = (byte) (sim1MNC[i]>>8)&0xFF
+            presetsBinary[j++] |= (byte) sim1MNC[i]&0xFF
+        }
+
+        crc16 = crc16Init()
+        for (int i = 0; i < FILE_LENGTH; i++) {
+            crc16 = crc16Update((short) crc16, presetsBinary[i])
+        }
+        presetsBinary[j++] = (byte) (crc16>>8)&0xFF
+        presetsBinary[j] |= (byte) crc16&0xFF
+    }
+
+    /**
+     * Clean all model arrays
+     */
+    void cleanAllModelArrays(){
+
+        Arrays.fill(sim0Apn, (byte) 0)
+        Arrays.fill(sim0ApnUser, (byte) 0)
+        Arrays.fill(sim0ApnPassword, (byte) 0)
+        Arrays.fill(sim1Apn, (byte) 0)
+        Arrays.fill(sim1ApnUser, (byte) 0)
+        Arrays.fill(sim1ApnPassword, (byte) 0)
+        Arrays.fill(serverURL, (byte) 0)
+        Arrays.fill(serverPort, (byte) 0)
+        Arrays.fill(sim1MCC, (int) 0)
+        Arrays.fill(sim1MNC, (int) 0)
+    }
+
+    void fromUiPresetModelToByteArray(UIPresetsModel model){
+
+        cleanAllModelArrays()
+
+        try {
+            byteArrayCopy(model.sim0Apn.getBytes(), sim0Apn)
+            byteArrayCopy(model.sim0ApnUser.getBytes(), sim0ApnUser)
+            byteArrayCopy(model.sim0ApnPassword.getBytes(), sim0ApnPassword)
+
+            byteArrayCopy(model.sim1Apn.getBytes(), sim1Apn)
+            byteArrayCopy(model.sim1ApnUser.getBytes(), sim1ApnUser)
+            byteArrayCopy(model.sim1ApnPassword.getBytes(), sim1ApnPassword)
+
+            byteArrayCopy(model.serverURL.getBytes(), serverURL)
+            byteArrayCopy(model.serverPort.getBytes(), serverPort)
+
+            sensorEnable0 = (short)model.sensorEnable0.toInteger()
+            sensorEnable1 = (short)model.sensorEnable1.toInteger()
+
+            levelMax0 = model.levelMax0.toInteger()
+            levelMax1 = model.levelMax1.toInteger()
+
+            dLevelMaxPrecent0 = (short)model.dLevelMaxPrecent0.toInteger()
+            dLevelMaxPrecent1 = (short)model.dLevelMaxPrecent1.toInteger()
+
+            deviceID = model.deviceID.toLong()
+            sim0MCC = model.sim0MCCMNC.MCC.toInteger()
+            sim0MNC = model.sim0MCCMNC.MNC.toInteger()
+
+            for(int i; i<model.sim1MCCMNC.size(); i++){
+
+                sim1MCC[i] = model.sim1MCCMNC.MCC[i].toInteger()
+                sim1MNC[i] = model.sim1MCCMNC.MNC[i].toInteger()
+            }
+
+            fromPresetByteModelToByteArray()
+
+        } catch (Exception e) {
+
+            println ("Incorrect data")
+            println (e.message)
+        }
+    }
+
+    /**
+     * Save binary file
+     * @param fileName
+     * @return
+     */
+    void writeFile(String fileName) {
+
+        byte[] writeBuffer = presetsBinary
+        try {
+            Path path = FileSystems.getDefault().getPath(fileName)
+            Files.write(path, writeBuffer)
+
+        } catch (Exception e) {
+
+            println(e.message)
+            println("Can't save file")
+        }
+    }
+
+    void byteArrayCopy(byte[] src, byte[] dst){
+
+        for(int i; i<src.length; i++){
+            dst[i] = src[i]
+        }
+    }
+
+    Short crc16Init() {
+        return (0xFFFF)
+    }
+
+    Short crc16Update(Short crc16, byte dat) {
+        int i
+        crc16 ^= dat
+        for (i = 0; i < 8; ++i) {
+            if (crc16 & 0x0001)
+                crc16 = (crc16 >> 1) ^ 0xA001
+            else
+                crc16 >>= 1
+        }
+        return crc16
     }
 
 
