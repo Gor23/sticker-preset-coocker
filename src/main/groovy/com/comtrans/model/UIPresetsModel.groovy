@@ -1,5 +1,8 @@
 package com.comtrans.model
 
+import groovy.transform.ToString
+
+@ToString
 class UIPresetsModel {
 
     //sim 0 settings/////////
