@@ -1,13 +1,3 @@
-<html>
-<head>
-    <meta charset="utf-8"/>
-    <title>Изменение цвета текста</title>
-    <style>
-        .colortext {
-            color: red; /* Красный цвет выделения */
-        }
-    </style>
-</head>
 
 <#if defaultPreset == true>
 <span class = "colortext"> Файл с настройками для устройства ${preset.deviceID} не найден, загружен дэфолтный</span>
@@ -421,4 +411,3 @@
         <button  class="btn btn-default" type="submit">Сохранить</button>
     </div>
 </form>
-</html>

@@ -325,6 +325,6 @@ class MainController {
         }
 
         model.addAttribute("fail", isSaveFail)
-        return "finish"
+        return "input"
     }
 }
