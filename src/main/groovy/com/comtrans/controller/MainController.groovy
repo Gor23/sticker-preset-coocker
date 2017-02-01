@@ -1,8 +1,10 @@
 package com.comtrans.controller
 
+import com.comtrans.model.MCCMNCModel
 import com.comtrans.model.UIPresetsModel
 import com.comtrans.service.PresetParserService
 import com.fasterxml.jackson.databind.ObjectMapper
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 
+@CompileStatic
 @Controller
 @Slf4j
 class MainController {
@@ -18,20 +21,55 @@ class MainController {
     @Autowired
     PresetParserService parserService
 
-    @Autowired
-    ObjectMapper objectMapper
+    @RequestMapping(value = '/input', method = RequestMethod.GET)
+    def inputId(Model model) {
 
-    @RequestMapping(value = '/preset', method = RequestMethod.GET)
-    def showTable(Model model) {
+        return "input"
+    }
 
-        UIPresetsModel presetsModel = parserService.readModelFromFile()
-        //model.addAttribute("preset", presetsModel)
-        //def json = objectMapper.writeValueAsString(presetsModel)
+    @RequestMapping(value = '/preset-table', method = RequestMethod.GET)
+    def showTable(Model model, @RequestParam(value = "ID") String ID) {
+
+        UIPresetsModel presetsModel
+        boolean defaultPreset = false
+
+        try {
+            presetsModel = parserService.readModelFromFile(ID)
+
+        } catch (Exception e) {
+
+            log.warn("Read default for id ${ID}", e)
+            presetsModel = parserService.readDefaultPresets(ID)
+            defaultPreset = true
+        }
+
+        model.addAttribute("defaultPreset", defaultPreset)
         model.addAttribute("preset", presetsModel)
         return "table"
     }
 
-    @RequestMapping(value = '/preset', method = RequestMethod.POST)
+    @RequestMapping(value = '/preset-table-root', method = RequestMethod.GET)
+    def showTableRoot(Model model, @RequestParam(value = "ID") String ID) {
+
+        UIPresetsModel presetsModel
+        boolean defaultPreset = false
+
+        try {
+            presetsModel = parserService.readModelFromFile(ID)
+
+        } catch (Exception e) {
+
+            log.warn("Read default for id ${ID}", e)
+            presetsModel = parserService.readDefaultPresets(ID)
+            defaultPreset = true
+        }
+
+        model.addAttribute("defaultPreset", defaultPreset)
+        model.addAttribute("preset", presetsModel)
+        return "table-root"
+    }
+
+    @RequestMapping(value = '/preset-table', method = RequestMethod.POST)
     def saveData(Model model,
                  @RequestParam(value = "ID") String ID,
                  @RequestParam(value = "sim0Apn") String sim0Apn,
@@ -183,11 +221,110 @@ class MainController {
                  @RequestParam(value = "sim1MCC68") String sim1MCC68,
                  @RequestParam(value = "sim1MNC68") String sim1MNC68,
                  @RequestParam(value = "sim1MCC69") String sim1MCC69,
-                 @RequestParam(value = "sim1MNC69") String sim1MNC69,
-                 @RequestParam(value = "sim1MCC70") String sim1MCC70,
-                 @RequestParam(value = "sim1MNC70") String sim1MNC70
-                 ) {
+                 @RequestParam(value = "sim1MNC69") String sim1MNC69
+    ) {
 
-        //return "table"
+        boolean isSaveFail = false
+
+        try {
+            UIPresetsModel presetsModel = new UIPresetsModel(
+
+                    deviceID: ID,
+                    sim0Apn: sim0Apn,
+                    sim0ApnUser: sim0ApnUser,
+                    sim0ApnPassword: sim0ApnPassword,
+                    sim1Apn: sim1Apn,
+                    sim1ApnUser: sim1ApnUser,
+                    sim1ApnPassword: sim1ApnPassword,
+                    serverURL: serverURL,
+                    serverPort: serverPort,
+                    sensorEnable0: "0",
+                    sensorEnable1: "0",
+                    levelMax0: "0",
+                    levelMax1: "0",
+                    dLevelMaxPrecent0: "0",
+                    dLevelMaxPrecent1: "0",
+                    sim0MCCMNC: new MCCMNCModel(MCC: sim0MCC, MNC: sim0MNC),
+                    sim1MCCMNC: [new MCCMNCModel(MCC: sim1MCC0, MNC: sim1MNC0),
+                                 new MCCMNCModel(MCC: sim1MCC1, MNC: sim1MNC1),
+                                 new MCCMNCModel(MCC: sim1MCC2, MNC: sim1MNC2),
+                                 new MCCMNCModel(MCC: sim1MCC3, MNC: sim1MNC3),
+                                 new MCCMNCModel(MCC: sim1MCC4, MNC: sim1MNC4),
+                                 new MCCMNCModel(MCC: sim1MCC5, MNC: sim1MNC5),
+                                 new MCCMNCModel(MCC: sim1MCC6, MNC: sim1MNC6),
+                                 new MCCMNCModel(MCC: sim1MCC7, MNC: sim1MNC7),
+                                 new MCCMNCModel(MCC: sim1MCC8, MNC: sim1MNC8),
+                                 new MCCMNCModel(MCC: sim1MCC9, MNC: sim1MNC9),
+                                 new MCCMNCModel(MCC: sim1MCC10, MNC: sim1MNC10),
+                                 new MCCMNCModel(MCC: sim1MCC11, MNC: sim1MNC11),
+                                 new MCCMNCModel(MCC: sim1MCC12, MNC: sim1MNC12),
+                                 new MCCMNCModel(MCC: sim1MCC13, MNC: sim1MNC13),
+                                 new MCCMNCModel(MCC: sim1MCC14, MNC: sim1MNC14),
+                                 new MCCMNCModel(MCC: sim1MCC15, MNC: sim1MNC15),
+                                 new MCCMNCModel(MCC: sim1MCC16, MNC: sim1MNC16),
+                                 new MCCMNCModel(MCC: sim1MCC17, MNC: sim1MNC17),
+                                 new MCCMNCModel(MCC: sim1MCC18, MNC: sim1MNC18),
+                                 new MCCMNCModel(MCC: sim1MCC19, MNC: sim1MNC19),
+                                 new MCCMNCModel(MCC: sim1MCC20, MNC: sim1MNC20),
+                                 new MCCMNCModel(MCC: sim1MCC21, MNC: sim1MNC21),
+                                 new MCCMNCModel(MCC: sim1MCC22, MNC: sim1MNC22),
+                                 new MCCMNCModel(MCC: sim1MCC23, MNC: sim1MNC23),
+                                 new MCCMNCModel(MCC: sim1MCC24, MNC: sim1MNC24),
+                                 new MCCMNCModel(MCC: sim1MCC25, MNC: sim1MNC25),
+                                 new MCCMNCModel(MCC: sim1MCC26, MNC: sim1MNC26),
+                                 new MCCMNCModel(MCC: sim1MCC27, MNC: sim1MNC27),
+                                 new MCCMNCModel(MCC: sim1MCC28, MNC: sim1MNC28),
+                                 new MCCMNCModel(MCC: sim1MCC29, MNC: sim1MNC29),
+                                 new MCCMNCModel(MCC: sim1MCC30, MNC: sim1MNC30),
+                                 new MCCMNCModel(MCC: sim1MCC31, MNC: sim1MNC31),
+                                 new MCCMNCModel(MCC: sim1MCC32, MNC: sim1MNC32),
+                                 new MCCMNCModel(MCC: sim1MCC33, MNC: sim1MNC33),
+                                 new MCCMNCModel(MCC: sim1MCC34, MNC: sim1MNC34),
+                                 new MCCMNCModel(MCC: sim1MCC35, MNC: sim1MNC35),
+                                 new MCCMNCModel(MCC: sim1MCC36, MNC: sim1MNC36),
+                                 new MCCMNCModel(MCC: sim1MCC37, MNC: sim1MNC37),
+                                 new MCCMNCModel(MCC: sim1MCC38, MNC: sim1MNC38),
+                                 new MCCMNCModel(MCC: sim1MCC39, MNC: sim1MNC39),
+                                 new MCCMNCModel(MCC: sim1MCC40, MNC: sim1MNC40),
+                                 new MCCMNCModel(MCC: sim1MCC41, MNC: sim1MNC41),
+                                 new MCCMNCModel(MCC: sim1MCC42, MNC: sim1MNC42),
+                                 new MCCMNCModel(MCC: sim1MCC43, MNC: sim1MNC43),
+                                 new MCCMNCModel(MCC: sim1MCC44, MNC: sim1MNC44),
+                                 new MCCMNCModel(MCC: sim1MCC45, MNC: sim1MNC45),
+                                 new MCCMNCModel(MCC: sim1MCC46, MNC: sim1MNC46),
+                                 new MCCMNCModel(MCC: sim1MCC47, MNC: sim1MNC47),
+                                 new MCCMNCModel(MCC: sim1MCC48, MNC: sim1MNC48),
+                                 new MCCMNCModel(MCC: sim1MCC49, MNC: sim1MNC49),
+                                 new MCCMNCModel(MCC: sim1MCC50, MNC: sim1MNC50),
+                                 new MCCMNCModel(MCC: sim1MCC51, MNC: sim1MNC51),
+                                 new MCCMNCModel(MCC: sim1MCC52, MNC: sim1MNC52),
+                                 new MCCMNCModel(MCC: sim1MCC53, MNC: sim1MNC53),
+                                 new MCCMNCModel(MCC: sim1MCC54, MNC: sim1MNC54),
+                                 new MCCMNCModel(MCC: sim1MCC55, MNC: sim1MNC55),
+                                 new MCCMNCModel(MCC: sim1MCC56, MNC: sim1MNC56),
+                                 new MCCMNCModel(MCC: sim1MCC57, MNC: sim1MNC57),
+                                 new MCCMNCModel(MCC: sim1MCC58, MNC: sim1MNC58),
+                                 new MCCMNCModel(MCC: sim1MCC59, MNC: sim1MNC59),
+                                 new MCCMNCModel(MCC: sim1MCC60, MNC: sim1MNC60),
+                                 new MCCMNCModel(MCC: sim1MCC61, MNC: sim1MNC61),
+                                 new MCCMNCModel(MCC: sim1MCC62, MNC: sim1MNC62),
+                                 new MCCMNCModel(MCC: sim1MCC63, MNC: sim1MNC63),
+                                 new MCCMNCModel(MCC: sim1MCC64, MNC: sim1MNC64),
+                                 new MCCMNCModel(MCC: sim1MCC65, MNC: sim1MNC65),
+                                 new MCCMNCModel(MCC: sim1MCC66, MNC: sim1MNC66),
+                                 new MCCMNCModel(MCC: sim1MCC67, MNC: sim1MNC67),
+                                 new MCCMNCModel(MCC: sim1MCC68, MNC: sim1MNC68),
+                                 new MCCMNCModel(MCC: sim1MCC69, MNC: sim1MNC69)
+                    ]
+            )
+            parserService.fromUiPresetModelToByteArray(presetsModel)
+            parserService.writeFile(ID)
+        } catch (Exception e) {
+            log.error("Error while file save", e)
+            isSaveFail = true
+        }
+
+        model.addAttribute("fail", isSaveFail)
+        return "finish"
     }
 }

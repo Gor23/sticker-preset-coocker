@@ -2,7 +2,10 @@ package com.comtrans.service
 
 import com.comtrans.model.MCCMNCModel
 import com.comtrans.model.UIPresetsModel
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Service
 
 import javax.annotation.PostConstruct
@@ -10,6 +13,7 @@ import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 
+@Scope("prototype")
 @Service
 @Slf4j
 class PresetParserService {
@@ -24,11 +28,9 @@ class PresetParserService {
 //        println("finish")
 //    }
 
-    UIPresetsModel readModelFromFile(){
 
-        readFile("/home/igor/Dropbox/preset.bin")
-        return toUIPresetModel()
-    }
+    @Value('${preset.path:/daemon/server/presets/}')
+    String pathToPresetsFolder
 
     final static Integer FILE_LENGTH = 441
     final static Integer APN_STRING_LENGTH = 31
@@ -36,6 +38,7 @@ class PresetParserService {
     final static Integer APN_PASSWORD_STRING_LENGTH = 11
     final static Integer SERVER_URL_STRING_LENGTH = 31
     final static Integer SERVER_PORT_STRING_LENGTH = 6
+    final static Integer ID_START_POSITION = 151
 
     private byte[] presetsBinary = new byte[FILE_LENGTH]
 
@@ -71,6 +74,43 @@ class PresetParserService {
     Integer crc16
 
     /**
+     * Прочитать файл с натройками и выдать модель
+     * @param ID
+     * @return
+     */
+    UIPresetsModel readModelFromFile(String ID) {
+
+        readFile(pathToPresetsFolder + ID)
+        return toUIPresetModel()
+    }
+
+    /**
+     * Прочитать файл с дефолтными натройками и выдать модель, ID в файл вбивается тот который бал введён
+     * @param ID
+     * @return
+     */
+    UIPresetsModel readDefaultPresets(String ID) {
+
+        Long defDevID = 0
+        Integer position = ID_START_POSITION
+
+        readFile(pathToPresetsFolder + "preset")
+        defDevID = ID.toLong()
+        presetsBinary[position++] = 0
+        presetsBinary[position++] = 0
+        presetsBinary[position++] = 0
+        presetsBinary[position] = 0
+
+        position = ID_START_POSITION
+        presetsBinary[position++] = (byte) (defDevID >> 24) & 0xFF
+        presetsBinary[position++] |= (byte) (defDevID >> 16) & 0xFF
+        presetsBinary[position++] |= (byte) (defDevID >> 8) & 0xFF
+        presetsBinary[position] |= (byte) defDevID & 0xFF
+
+        return toUIPresetModel()
+    }
+
+    /**
      * Load binary file
      * @param fileName
      * @return
@@ -78,23 +118,13 @@ class PresetParserService {
     void readFile(String fileName) {
 
         byte[] fileData
+        Path path = FileSystems.getDefault().getPath(fileName)
+        fileData = Files.readAllBytes(path)
 
-        try {
-            Path path = FileSystems.getDefault().getPath(fileName)
-            fileData = Files.readAllBytes(path)
-
-            if (fileData.length != FILE_LENGTH) {
-                println("File length is incorrect must be ${FILE_LENGTH} but length is ${fileData.length}")
-                throw new Exception("File length is incorrect must be ${FILE_LENGTH} but length is ${fileData.length}")
-            }
-        } catch (Exception e) {
-
-            println(e.message)
-            println("Create default")
-            //TODO load default
-            fileData = new byte[FILE_LENGTH]
+        if (fileData.length != FILE_LENGTH) {
+            println("File length is incorrect must be ${FILE_LENGTH} but length is ${fileData.length}")
+            throw new Exception("File length is incorrect must be ${FILE_LENGTH} but length is ${fileData.length}")
         }
-
         Arrays.fill(presetsBinary, (byte) 0)
         presetsBinary = fileData
     }
@@ -130,16 +160,16 @@ class PresetParserService {
         for (int i; i < serverPort.length; i++) {
             serverPort[i] = presetsBinary[j++]
         }
-        sensorEnable0 = presetsBinary[j++] & 0xFF
-        sensorEnable1 = presetsBinary[j++] & 0xFF
+        sensorEnable0 = (short) (presetsBinary[j++] & 0xFF)
+        sensorEnable1 = (short) (presetsBinary[j++] & 0xFF)
 
         levelMax0 = (presetsBinary[j++] & 0xFF) << 8
         levelMax0 |= presetsBinary[j++] & 0xFF
         levelMax1 = (presetsBinary[j++] & 0xFF) << 8
         levelMax1 |= presetsBinary[j++] & 0xFF
 
-        dLevelMaxPrecent0 = presetsBinary[j++] & 0xFF
-        dLevelMaxPrecent1 = presetsBinary[j++] & 0xFF
+        dLevelMaxPrecent0 = (short) (presetsBinary[j++] & 0xFF)
+        dLevelMaxPrecent1 = (short) (presetsBinary[j++] & 0xFF)
 
         deviceID = (presetsBinary[j++] & 0xFF) << 24
         deviceID |= (presetsBinary[j++] & 0xFF) << 16
@@ -229,48 +259,48 @@ class PresetParserService {
         for (int i; i < serverPort.length; i++) {
             presetsBinary[j++] = serverPort[i]
         }
-        presetsBinary[j++] = (byte) sensorEnable0&0xFF
-        presetsBinary[j++] = (byte) sensorEnable0&0xFF
+        presetsBinary[j++] = (byte) (sensorEnable0 & 0xFF)
+        presetsBinary[j++] = (byte) (sensorEnable0 & 0xFF)
 
-        presetsBinary[j++] = (byte)(levelMax0>>8)&0xFF
-        presetsBinary[j++] |= (byte)levelMax0&0xFF
-        presetsBinary[j++] = (byte)(levelMax1>>8)&0xFF
-        presetsBinary[j++] |= (byte)levelMax1&0xFF
+        presetsBinary[j++] = (byte) ((levelMax0 >> 8) & 0xFF)
+        presetsBinary[j++] |= (byte) (levelMax0 & 0xFF)
+        presetsBinary[j++] = (byte) ((levelMax1 >> 8) & 0xFF)
+        presetsBinary[j++] |= (byte) (levelMax1 & 0xFF)
 
-        presetsBinary[j++] = (byte)dLevelMaxPrecent0&0xFF
-        presetsBinary[j++] = (byte)dLevelMaxPrecent1&0xFF
+        presetsBinary[j++] = (byte) (dLevelMaxPrecent0 & 0xFF)
+        presetsBinary[j++] = (byte) (dLevelMaxPrecent1 & 0xFF)
 
-        presetsBinary[j++] = (byte) (deviceID>>24)&0xFF
-        presetsBinary[j++] |= (byte) (deviceID>>16)&0xFF
-        presetsBinary[j++] |= (byte) (deviceID>>8)&0xFF
-        presetsBinary[j++] |= (byte) deviceID&0xFF
+        presetsBinary[j++] = (byte) (deviceID >> 24) & 0xFF
+        presetsBinary[j++] |= (byte) (deviceID >> 16) & 0xFF
+        presetsBinary[j++] |= (byte) (deviceID >> 8) & 0xFF
+        presetsBinary[j++] |= (byte) deviceID & 0xFF
 
 
-        presetsBinary[j++] = (byte) (sim0MCC>>8)&0xFF
-        presetsBinary[j++] |= (byte) sim0MCC&0xFF
-        presetsBinary[j++] = (byte) (sim0MNC>>8)&0xFF
-        presetsBinary[j++] |= (byte) sim0MNC&0xFF
+        presetsBinary[j++] = (byte) (sim0MCC >> 8) & 0xFF
+        presetsBinary[j++] |= (byte) sim0MCC & 0xFF
+        presetsBinary[j++] = (byte) (sim0MNC >> 8) & 0xFF
+        presetsBinary[j++] |= (byte) sim0MNC & 0xFF
 
 
         for (int i; i < sim1MCC.length; i++) {
-            presetsBinary[j++] = (byte) (sim1MCC[i]>>8)&0xFF
-            presetsBinary[j++] |= (byte) sim1MCC[i]&0xFF
-            presetsBinary[j++] = (byte) (sim1MNC[i]>>8)&0xFF
-            presetsBinary[j++] |= (byte) sim1MNC[i]&0xFF
+            presetsBinary[j++] = (byte) (sim1MCC[i] >> 8) & 0xFF
+            presetsBinary[j++] |= (byte) sim1MCC[i] & 0xFF
+            presetsBinary[j++] = (byte) (sim1MNC[i] >> 8) & 0xFF
+            presetsBinary[j++] |= (byte) sim1MNC[i] & 0xFF
         }
 
         crc16 = crc16Init()
         for (int i = 0; i < FILE_LENGTH; i++) {
             crc16 = crc16Update((short) crc16, presetsBinary[i])
         }
-        presetsBinary[j++] = (byte) (crc16>>8)&0xFF
-        presetsBinary[j] |= (byte) crc16&0xFF
+        presetsBinary[j++] = (byte) (crc16 >> 8) & 0xFF
+        presetsBinary[j] |= (byte) crc16 & 0xFF
     }
 
     /**
      * Clean all model arrays
      */
-    void cleanAllModelArrays(){
+    void cleanAllModelArrays() {
 
         Arrays.fill(sim0Apn, (byte) 0)
         Arrays.fill(sim0ApnUser, (byte) 0)
@@ -284,7 +314,7 @@ class PresetParserService {
         Arrays.fill(sim1MNC, (int) 0)
     }
 
-    void fromUiPresetModelToByteArray(UIPresetsModel model){
+    void fromUiPresetModelToByteArray(UIPresetsModel model) {
 
         cleanAllModelArrays()
 
@@ -300,20 +330,20 @@ class PresetParserService {
             byteArrayCopy(model.serverURL.getBytes(), serverURL)
             byteArrayCopy(model.serverPort.getBytes(), serverPort)
 
-            sensorEnable0 = (short)model.sensorEnable0.toInteger()
-            sensorEnable1 = (short)model.sensorEnable1.toInteger()
+            sensorEnable0 = (short) model.sensorEnable0.toInteger()
+            sensorEnable1 = (short) model.sensorEnable1.toInteger()
 
             levelMax0 = model.levelMax0.toInteger()
             levelMax1 = model.levelMax1.toInteger()
 
-            dLevelMaxPrecent0 = (short)model.dLevelMaxPrecent0.toInteger()
-            dLevelMaxPrecent1 = (short)model.dLevelMaxPrecent1.toInteger()
+            dLevelMaxPrecent0 = (short) model.dLevelMaxPrecent0.toInteger()
+            dLevelMaxPrecent1 = (short) model.dLevelMaxPrecent1.toInteger()
 
             deviceID = model.deviceID.toLong()
             sim0MCC = model.sim0MCCMNC.MCC.toInteger()
             sim0MNC = model.sim0MCCMNC.MNC.toInteger()
 
-            for(int i; i<model.sim1MCCMNC.size(); i++){
+            for (int i; i < model.sim1MCCMNC.size(); i++) {
 
                 sim1MCC[i] = model.sim1MCCMNC.MCC[i].toInteger()
                 sim1MNC[i] = model.sim1MCCMNC.MNC[i].toInteger()
@@ -323,8 +353,8 @@ class PresetParserService {
 
         } catch (Exception e) {
 
-            println ("Incorrect data")
-            println (e.message)
+            println("Incorrect data")
+            println(e.message)
         }
     }
 
@@ -335,10 +365,9 @@ class PresetParserService {
      */
     void writeFile(String fileName) {
 
-        byte[] writeBuffer = presetsBinary
         try {
-            Path path = FileSystems.getDefault().getPath(fileName)
-            Files.write(path, writeBuffer)
+            Path path = FileSystems.getDefault().getPath(pathToPresetsFolder + fileName)
+            Files.write(path, presetsBinary)
 
         } catch (Exception e) {
 
@@ -347,9 +376,9 @@ class PresetParserService {
         }
     }
 
-    void byteArrayCopy(byte[] src, byte[] dst){
+    void byteArrayCopy(byte[] src, byte[] dst) {
 
-        for(int i; i<src.length; i++){
+        for (int i; i < src.length; i++) {
             dst[i] = src[i]
         }
     }

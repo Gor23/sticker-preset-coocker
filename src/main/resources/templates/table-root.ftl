@@ -26,15 +26,15 @@
         </tr>
         <tr>
             <td>Точка доступа сим 0</td>
-            <td><input type="text" name="sim0Apn" class="form-control" readonly="readonly" value=${preset.sim0Apn}></td>
+            <td><input type="text" name="sim0Apn" class="form-control" value=${preset.sim0Apn}></td>
         </tr>
         <tr>
             <td>Пользователь сим 0</td>
-            <td><input type="text" name="sim0ApnUser" class="form-control" readonly="readonly" value=${preset.sim0ApnUser}></td>
+            <td><input type="text" name="sim0ApnUser" class="form-control" value=${preset.sim0ApnUser}></td>
         </tr>
         <tr>
             <td>Пароль сим 0</td>
-            <td><input type="text" name="sim0ApnPassword" class="form-control" readonly="readonly" value=${preset.sim0ApnPassword}></td>
+            <td><input type="text" name="sim0ApnPassword" class="form-control" value=${preset.sim0ApnPassword}></td>
         </tr>
         <tr>
             <td>Точка доступа сим 1</td>
@@ -50,11 +50,11 @@
         </tr>
         <tr>
             <td>Путь к сервера</td>
-            <td><input type="text" name="serverURL" class="form-control" readonly="readonly" value=${preset.serverURL}></td>
+            <td><input type="text" name="serverURL" class="form-control" value=${preset.serverURL}></td>
         </tr>
         <tr>
             <td>Порт сервера</td>
-            <td><input type="text" name="serverPort" class="form-control" readonly="readonly" value=${preset.serverPort}></td>
+            <td><input type="text" name="serverPort" class="form-control" value=${preset.serverPort}></td>
         </tr>
         <tr>
             <td>Сим 0 MCC/MNC</td>
