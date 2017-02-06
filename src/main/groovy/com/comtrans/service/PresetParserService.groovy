@@ -102,10 +102,10 @@ class PresetParserService {
         presetsBinary[position] = 0
 
         position = ID_START_POSITION
-        presetsBinary[position++] = (byte) (defDevID >> 24) & 0xFF
-        presetsBinary[position++] |= (byte) (defDevID >> 16) & 0xFF
+        presetsBinary[position++] = (byte) defDevID & 0xFF
         presetsBinary[position++] |= (byte) (defDevID >> 8) & 0xFF
-        presetsBinary[position] |= (byte) defDevID & 0xFF
+        presetsBinary[position++] |= (byte) (defDevID >> 16) & 0xFF
+        presetsBinary[position] |= (byte) (defDevID >> 24) & 0xFF
 
         return toUIPresetModel()
     }
@@ -163,33 +163,34 @@ class PresetParserService {
         sensorEnable0 = (short) (presetsBinary[j++] & 0xFF)
         sensorEnable1 = (short) (presetsBinary[j++] & 0xFF)
 
-        levelMax0 = (presetsBinary[j++] & 0xFF) << 8
-        levelMax0 |= presetsBinary[j++] & 0xFF
-        levelMax1 = (presetsBinary[j++] & 0xFF) << 8
-        levelMax1 |= presetsBinary[j++] & 0xFF
+        levelMax0 = presetsBinary[j++] & 0xFF
+        levelMax0 |= (presetsBinary[j++] & 0xFF) << 8
+        levelMax1 = presetsBinary[j++] & 0xFF
+        levelMax1 |= (presetsBinary[j++] & 0xFF) << 8
 
         dLevelMaxPrecent0 = (short) (presetsBinary[j++] & 0xFF)
         dLevelMaxPrecent1 = (short) (presetsBinary[j++] & 0xFF)
 
-        deviceID = (presetsBinary[j++] & 0xFF) << 24
-        deviceID |= (presetsBinary[j++] & 0xFF) << 16
+        deviceID = presetsBinary[j++] & 0xFF
         deviceID |= (presetsBinary[j++] & 0xFF) << 8
-        deviceID |= presetsBinary[j++] & 0xFF
+        deviceID |= (presetsBinary[j++] & 0xFF) << 16
+        deviceID |= (presetsBinary[j++] & 0xFF) << 24
 
-        sim0MCC = (presetsBinary[j++] & 0xFF) << 8
-        sim0MCC |= presetsBinary[j++] & 0xFF
-        sim0MNC = (presetsBinary[j++] & 0xFF) << 8
-        sim0MNC |= presetsBinary[j++] & 0xFF
+        sim0MCC = presetsBinary[j++] & 0xFF
+        sim0MCC |= (presetsBinary[j++] & 0xFF) << 8
+        sim0MNC = presetsBinary[j++] & 0xFF
+        sim0MCC |= (presetsBinary[j++] & 0xFF) << 8
 
         for (int i; i < sim1MCC.length; i++) {
-            sim1MCC[i] = (presetsBinary[j++] & 0xFF) << 8
-            sim1MCC[i] |= presetsBinary[j++] & 0xFF
-            sim1MNC[i] = (presetsBinary[j++] & 0xFF) << 8
-            sim1MNC[i] |= presetsBinary[j++] & 0xFF
+            sim1MCC[i] = presetsBinary[j++] & 0xFF
+            sim1MCC[i] |= (presetsBinary[j++] & 0xFF) << 8
+            sim1MNC[i] = presetsBinary[j++] & 0xFF
+            sim1MNC[i] |= (presetsBinary[j++] & 0xFF) << 8
         }
 
-        crc16 = (presetsBinary[j++] & 0xFF) << 8
-        crc16 |= presetsBinary[j] & 0xFF
+        crc16 = presetsBinary[j++] & 0xFF
+        crc16 |= (presetsBinary[j] & 0xFF) << 8
+        log.info("Read crc ${Integer.toHexString(crc16)}")
     }
 
     /**
@@ -262,39 +263,41 @@ class PresetParserService {
         presetsBinary[j++] = (byte) (sensorEnable0 & 0xFF)
         presetsBinary[j++] = (byte) (sensorEnable0 & 0xFF)
 
-        presetsBinary[j++] = (byte) ((levelMax0 >> 8) & 0xFF)
-        presetsBinary[j++] |= (byte) (levelMax0 & 0xFF)
-        presetsBinary[j++] = (byte) ((levelMax1 >> 8) & 0xFF)
-        presetsBinary[j++] |= (byte) (levelMax1 & 0xFF)
+        presetsBinary[j++] = (byte) (levelMax0 & 0xFF)
+        presetsBinary[j++] = (byte) ((levelMax0 >>> 8) & 0xFF)
+        presetsBinary[j++] = (byte) (levelMax0 & 0xFF)
+        presetsBinary[j++] = (byte) ((levelMax0 >>> 8) & 0xFF)
 
         presetsBinary[j++] = (byte) (dLevelMaxPrecent0 & 0xFF)
         presetsBinary[j++] = (byte) (dLevelMaxPrecent1 & 0xFF)
 
-        presetsBinary[j++] = (byte) (deviceID >> 24) & 0xFF
-        presetsBinary[j++] |= (byte) (deviceID >> 16) & 0xFF
-        presetsBinary[j++] |= (byte) (deviceID >> 8) & 0xFF
-        presetsBinary[j++] |= (byte) deviceID & 0xFF
+        presetsBinary[j++] = (byte) (deviceID & 0xFF)
+        presetsBinary[j++] = (byte) (deviceID >>> 8) & 0xFF
+        presetsBinary[j++] = (byte) (deviceID >>> 16) & 0xFF
+        presetsBinary[j++] = (byte) (deviceID >>> 24) & 0xFF
 
-
-        presetsBinary[j++] = (byte) (sim0MCC >> 8) & 0xFF
-        presetsBinary[j++] |= (byte) sim0MCC & 0xFF
-        presetsBinary[j++] = (byte) (sim0MNC >> 8) & 0xFF
-        presetsBinary[j++] |= (byte) sim0MNC & 0xFF
+        presetsBinary[j++] = (byte) (sim0MCC & 0xFF)
+        presetsBinary[j++] = (byte) (sim0MCC >>> 8) & 0xFF
+        presetsBinary[j++] = (byte) (sim0MNC & 0xFF)
+        presetsBinary[j++] = (byte) (sim0MNC >>> 8) & 0xFF
 
 
         for (int i; i < sim1MCC.length; i++) {
-            presetsBinary[j++] = (byte) (sim1MCC[i] >> 8) & 0xFF
-            presetsBinary[j++] |= (byte) sim1MCC[i] & 0xFF
-            presetsBinary[j++] = (byte) (sim1MNC[i] >> 8) & 0xFF
-            presetsBinary[j++] |= (byte) sim1MNC[i] & 0xFF
+            presetsBinary[j++] = (byte) (sim1MCC[i] & 0xFF)
+            presetsBinary[j++] = (byte) (sim1MCC[i] >>> 8) & 0xFF
+            presetsBinary[j++] = (byte) (sim1MNC[i] & 0xFF)
+            presetsBinary[j++] = (byte) (sim1MNC[i] >>> 8) & 0xFF
         }
 
         crc16 = crc16Init()
-        for (int i = 0; i < FILE_LENGTH; i++) {
-            crc16 = crc16Update((short) crc16, presetsBinary[i])
+        for (int i = 0; i < FILE_LENGTH-2; i++) {
+            crc16 = crc16Update(crc16, (short)presetsBinary[i])
         }
-        presetsBinary[j++] = (byte) (crc16 >> 8) & 0xFF
-        presetsBinary[j] |= (byte) crc16 & 0xFF
+
+//        crc16 = calculate_crc(presetsBinary, FILE_LENGTH-2)
+        log.info("Wtite crc ${Integer.toHexString(crc16)}")
+        presetsBinary[j++] = (byte) (crc16 & 0xFF)
+        presetsBinary[j] = (byte) (crc16 >>> 8) & 0xFF
     }
 
     /**
@@ -353,8 +356,7 @@ class PresetParserService {
 
         } catch (Exception e) {
 
-            println("Incorrect data")
-            println(e.message)
+            log.warn("Incorrect data", e)
         }
     }
 
@@ -371,8 +373,7 @@ class PresetParserService {
 
         } catch (Exception e) {
 
-            println(e.message)
-            println("Can't save file")
+            log.warn("Can't save file", e)
         }
     }
 
@@ -387,18 +388,40 @@ class PresetParserService {
         return (0xFFFF)
     }
 
-    Short crc16Update(Short crc16, byte dat) {
+    Integer crc16Update(Integer crc16, short dat) {
+
         int i
-        crc16 ^= dat
+        log.info("data ${Integer.toHexString(dat&0xFF)}")
+        crc16 = (crc16^(dat&0xFF))&0xFFFF
+
         for (i = 0; i < 8; ++i) {
             if (crc16 & 0x0001)
-                crc16 = (crc16 >> 1) ^ 0xA001
+                crc16 = ((crc16 >>> 1) ^ 0xA001)&0XFFFF
             else
-                crc16 >>= 1
+                crc16 = (crc16>>>1)&0xFFFF
         }
+        log.info(Integer.toHexString(crc16))
         return crc16
     }
 
+
+    int calculate_crc(byte[] bytes, int length) {
+        int i
+        int crc_value = 0
+        for (int len = 0; len < length; len++) {
+            for (i = 0x80; i != 0; i >>= 1) {
+                if ((crc_value & 0x8000) != 0) {
+                    crc_value = (crc_value << 1) ^ 0x8005
+                } else {
+                    crc_value = crc_value << 1
+                }
+                if ((bytes[len] & i) != 0) {
+                    crc_value ^= 0x8005
+                }
+            }
+        }
+        return crc_value
+    }
 
 }
 

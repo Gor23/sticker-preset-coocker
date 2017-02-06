@@ -64,7 +64,7 @@
                                        value=${preset.serverPort}></td>
                         </tr>
                         <tr>
-                            <td>Сим 0 MCC/MNC</td>
+                            <td>Сим 0 MNC/MCC</td>
                             <td><input type="text" name="sim0MCC" class="form-control"
                                        value=${preset.sim0MCCMNC.MCC}></td>
                             <td><input type="text" name="sim0MNC" class="form-control"
@@ -72,7 +72,7 @@
                         </tr>
                         <tr>
                             <td></td>
-                            <td>Сим 1 MCC/MNC</td>
+                            <td>Сим 1 MNC/MCC</td>
                         </tr>
                         <tr>
                             <td>1</td>

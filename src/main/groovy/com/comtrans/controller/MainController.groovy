@@ -38,7 +38,7 @@ class MainController {
 
         } catch (Exception e) {
 
-            log.warn("Read default for id ${ID}", e)
+            log.warn("Read default for id ${ID}")
             presetsModel = parserService.readDefaultPresets(ID)
             defaultPreset = true
         }
@@ -92,8 +92,8 @@ class MainController {
                  @RequestParam(value = "sim1MNC3") String sim1MNC3,
                  @RequestParam(value = "sim1MCC4") String sim1MCC4,
                  @RequestParam(value = "sim1MNC4") String sim1MNC4,
-                 @RequestParam(value = "sim1MCC4") String sim1MCC5,
-                 @RequestParam(value = "sim1MNC4") String sim1MNC5,
+                 @RequestParam(value = "sim1MCC5") String sim1MCC5,
+                 @RequestParam(value = "sim1MNC5") String sim1MNC5,
                  @RequestParam(value = "sim1MCC6") String sim1MCC6,
                  @RequestParam(value = "sim1MNC6") String sim1MNC6,
                  @RequestParam(value = "sim1MCC7") String sim1MCC7,
@@ -238,12 +238,12 @@ class MainController {
                     sim1ApnPassword: sim1ApnPassword,
                     serverURL: serverURL,
                     serverPort: serverPort,
-                    sensorEnable0: "0",
-                    sensorEnable1: "0",
-                    levelMax0: "0",
-                    levelMax1: "0",
-                    dLevelMaxPrecent0: "0",
-                    dLevelMaxPrecent1: "0",
+                    sensorEnable0: "1",
+                    sensorEnable1: "1",
+                    levelMax0: "1023",
+                    levelMax1: "1023",
+                    dLevelMaxPrecent0: "5",
+                    dLevelMaxPrecent1: "5",
                     sim0MCCMNC: new MCCMNCModel(MCC: sim0MCC, MNC: sim0MNC),
                     sim1MCCMNC: [new MCCMNCModel(MCC: sim1MCC0, MNC: sim1MNC0),
                                  new MCCMNCModel(MCC: sim1MCC1, MNC: sim1MNC1),
