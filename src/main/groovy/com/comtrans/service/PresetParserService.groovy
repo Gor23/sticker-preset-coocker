@@ -391,7 +391,6 @@ class PresetParserService {
     Integer crc16Update(Integer crc16, short dat) {
 
         int i
-        log.info("data ${Integer.toHexString(dat&0xFF)}")
         crc16 = (crc16^(dat&0xFF))&0xFFFF
 
         for (i = 0; i < 8; ++i) {
@@ -400,7 +399,6 @@ class PresetParserService {
             else
                 crc16 = (crc16>>>1)&0xFFFF
         }
-        log.info(Integer.toHexString(crc16))
         return crc16
     }
 
