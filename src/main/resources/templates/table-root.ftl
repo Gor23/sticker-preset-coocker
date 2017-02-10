@@ -26,17 +26,17 @@
                         </tr>
                         <tr>
                             <td>Точка доступа сим 0</td>
-                            <td><input type="text" name="sim0Apn" class="form-control" readonly="readonly"
+                            <td><input type="text" name="sim0Apn" class="form-control"
                                        value=${preset.sim0Apn}></td>
                         </tr>
                         <tr>
                             <td>Пользователь сим 0</td>
-                            <td><input type="text" name="sim0ApnUser" class="form-control" readonly="readonly"
+                            <td><input type="text" name="sim0ApnUser" class="form-control"
                                        value=${preset.sim0ApnUser}></td>
                         </tr>
                         <tr>
                             <td>Пароль сим 0</td>
-                            <td><input type="text" name="sim0ApnPassword" class="form-control" readonly="readonly"
+                            <td><input type="text" name="sim0ApnPassword" class="form-control"
                                        value=${preset.sim0ApnPassword}></td>
                         </tr>
                         <tr>
@@ -55,16 +55,16 @@
                         </tr>
                         <tr>
                             <td>Путь к сервера</td>
-                            <td><input type="text" name="serverURL" class="form-control" readonly="readonly"
+                            <td><input type="text" name="serverURL" class="form-control"
                                        value=${preset.serverURL}></td>
                         </tr>
                         <tr>
                             <td>Порт сервера</td>
-                            <td><input type="text" name="serverPort" class="form-control" readonly="readonly"
+                            <td><input type="text" name="serverPort" class="form-control"
                                        value=${preset.serverPort}></td>
                         </tr>
                         <tr>
-                            <td>Сим 0 MCC/MNC</td>
+                            <td>Сим 0 MNC/MCC</td>
                             <td><input type="text" name="sim0MCC" class="form-control"
                                        value=${preset.sim0MCCMNC.MCC}></td>
                             <td><input type="text" name="sim0MNC" class="form-control"
@@ -72,7 +72,7 @@
                         </tr>
                         <tr>
                             <td></td>
-                            <td>Сим 1 MCC/MNC</td>
+                            <td>Сим 1 MNC/MCC</td>
                         </tr>
                         <tr>
                             <td>1</td>

@@ -19,6 +19,11 @@ jar {
 	version = '0.0.1-SNAPSHOT'
 }
 
+springBoot {
+	executable = true
+	mainClass = "com.comtrans.SrickerPresetCoocker"
+}
+
 sourceCompatibility = 1.8
 
 repositories {
