@@ -64,6 +64,16 @@
                                        value=${preset.serverPort}></td>
                         </tr>
                         <tr>
+                            <td>тип датчика 0 (0 uzor, 1 lls)</td>
+                            <td><input type="text" name="dLevelMaxPrecent0" class="form-control"
+                                       value=${preset.dLevelMaxPrecent0}></td>
+                        </tr>
+                        <tr>
+                            <td>тип датчика 1 (0 uzor, 1 lls)</td>
+                            <td><input type="text" name="dLevelMaxPrecent1" class="form-control"
+                                       value=${preset.dLevelMaxPrecent1}></td>
+                        </tr>
+                        <tr>
                             <td>Сим 0 MNC/MCC</td>
                             <td><input type="text" name="sim0MCC" class="form-control"
                                        value=${preset.sim0MCCMNC.MCC}></td>
